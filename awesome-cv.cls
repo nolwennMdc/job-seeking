@@ -188,10 +188,11 @@
 %-------------------------------------------------------------------------------
 % Configure styles for each CV elements
 % For fundamental structures
-\newcommand*{\headerfirstnamestyle}[1]{{\fontsize{32pt}{1em}\headerfontlight\color{graytext} #1}}
-\newcommand*{\headerlastnamestyle}[1]{{\fontsize{32pt}{1em}\headerfont\bfseries\color{text} #1}}
-\newcommand*{\headerpositionstyle}[1]{{\fontsize{7.6pt}{1em}\bodyfont\scshape\color{awesome} #1}}
+\newcommand*{\headerfirstnamestyle}[1]{{\fontsize{25pt}{1em}\headerfontlight\color{graytext} #1}}
+\newcommand*{\headerlastnamestyle}[1]{{\fontsize{25pt}{1em}\headerfont\bfseries\color{text} #1}}
+\newcommand*{\headerpositionstyle}[1]{{\fontsize{12pt}{1.5em}\bodyfont\scshape\color{awesome} #1}}
 \newcommand*{\headeraddressstyle}[1]{{\fontsize{8pt}{1em}\headerfont\itshape\color{lighttext} #1}}
+\newcommand*{\headerdateofbirthstyle}[1]{{\fontsize{8pt}{1em}\headerfont\itshape\color{lighttext} #1}}
 \newcommand*{\headersocialstyle}[1]{{\fontsize{6.8pt}{1em}\headerfont\color{text} #1}}
 \newcommand*{\headerquotestyle}[1]{{\fontsize{9pt}{1em}\bodyfont\itshape\color{darktext} #1}}
 \newcommand*{\footerstyle}[1]{{\fontsize{8pt}{1em}\footerfont\scshape\color{lighttext} #1}}
@@ -226,10 +227,11 @@
 % For elements of the cover letter
 \newcommand*{\lettersectionstyle}[1]{{\fontsize{14pt}{1em}\bodyfont\bfseries\color{text}\@sectioncolor #1}}
 \newcommand*{\recipientaddressstyle}[1]{{\fontsize{9pt}{1em}\bodyfont\scshape\color{graytext} #1}}
-\newcommand*{\recipienttitlestyle}[1]{{\fontsize{11pt}{1em}\bodyfont\bfseries\color{darktext} #1}}
+\newcommand*{\recipientdateofbirthstyle}[1]{{\fontsize{9pt}{1em}\bodyfont\scshape\color{graytext} #1}}
+\newcommand*{\recipienttitlestyle}[1]{{\fontsize{10pt}{1em}\bodyfont\bfseries\color{darktext} #1}}
 \newcommand*{\lettertitlestyle}[1]{{\fontsize{10pt}{1em}\bodyfontlight\bfseries\color{darktext} \underline{#1}}}
 \newcommand*{\letterdatestyle}[1]{{\fontsize{9pt}{1em}\bodyfontlight\slshape\color{graytext} #1}}
-\newcommand*{\lettertextstyle}{\fontsize{10pt}{1.4em}\bodyfontlight\upshape\color{graytext}}
+\newcommand*{\lettertextstyle}{\fontsize{10pt}{1.4em}\bodyfontlight\upshape\color{darktext}}
 \newcommand*{\letternamestyle}[1]{{\fontsize{10pt}{1em}\bodyfont\bfseries\color{darktext} #1}}
 \newcommand*{\letterenclosurestyle}[1]{{\fontsize{10pt}{1em}\bodyfontlight\slshape\color{lighttext} #1}}
 
@@ -268,6 +270,10 @@
 % Define writer's address
 % Usage: \address{<address>}
 \newcommand*{\address}[1]{\def\@address{#1}}
+
+% Define writer's date of birth
+% Usage: \dateofbirth{<date>}
+\newcommand*{\dateofbirth}[1]{\def\@dateofbirth{#1}}
 
 % Define writer's position
 % Usage: \name{<position>}
@@ -370,14 +376,15 @@
 \newcommand{\acvHeaderAfterNameSkip}{.4mm}
 \newcommand{\acvHeaderAfterPositionSkip}{.4mm}
 \newcommand{\acvHeaderAfterAddressSkip}{-.5mm}
+\newcommand{\acvHeaderAfterDateofbirthSkip}{-.5mm}
 \newcommand{\acvHeaderIconSep}{\space}
 \newcommand{\acvHeaderSocialSep}{\quad\textbar\quad}
 \newcommand{\acvHeaderAfterSocialSkip}{6mm}
 \newcommand{\acvHeaderAfterQuoteSkip}{5mm}
 
 % Others
-\newcommand{\acvSectionTopSkip}{3mm}
-\newcommand{\acvSectionContentTopSkip}{2.5mm}
+\newcommand{\acvSectionTopSkip}{2mm} %3
+\newcommand{\acvSectionContentTopSkip}{1.5mm} %2.5
 
 
 %-------------------------------------------------------------------------------
@@ -433,6 +440,7 @@
     \\[\acvHeaderAfterNameSkip]%
     \ifthenelse{\isundefined{\@position}}{}{\headerpositionstyle{\@position\\[\acvHeaderAfterPositionSkip]}}%
     \ifthenelse{\isundefined{\@address}}{}{\headeraddressstyle{\@address\\[\acvHeaderAfterAddressSkip]}}%
+    \ifthenelse{\isundefined{\@dateofbirth}}{}{\headerdateofbirthstyle{\@dateofbirth\\[\acvHeaderAfterDateofbirthSkip]}}%
     \headersocialstyle{%
       \newbool{isstart}%
       \setbool{isstart}{true}%
@@ -576,7 +584,19 @@
     \multicolumn{2}{L{\textwidth}}{\descriptionstyle{#5}}
   \end{tabular*}%
 }
-
+% Define a smaller entry of cv information
+% Usage: \cventryS{<position>}{<title>}{<location>}{<date>}{<description>}
+\newcommand*{\cventryS}[4]{%
+  \vspace{-2.0mm}
+  \setlength\tabcolsep{0pt}
+  \setlength{\extrarowheight}{0pt}
+  \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} L{\textwidth - 4.5cm} R{4.5cm}}
+    \ifempty{#2#3}
+      {\entrypositionstyle{#1} & \entrydatestyle{#4} \\}
+      {\entrytitlestyle{#2} & \entrylocationstyle{#3} \\
+      \entrypositionstyle{#1} & \entrydatestyle{#4} \\} 
+  \end{tabular*}%
+}
 % Define an environment for cvsubentry
 \newenvironment{cvsubentries}{%
   \begin{center}
@@ -637,6 +657,25 @@
 	\skilltypestyle{#1} & \skillsetstyle{#2} \\
 }
 
+% Define an environment for cvskill
+\newenvironment{cvskillsF}{%
+  \vspace{\acvSectionContentTopSkip}
+  \vspace{-2.0mm}
+  \begin{center}
+    \setlength\tabcolsep{1ex}
+    \setlength{\extrarowheight}{0pt}
+    \begin{tabular*}{\textwidth}{r l r l}
+}{%
+    \end{tabular*}
+  \end{center}
+}
+% Define a line of cv information(skill)
+% Usage: \cvskill4{<type>}{<skillset>}
+\newcommand*{\cvskillF}[4]{%
+  \skilltypestyle{#1} & \skillsetstyle{#2} & \skilltypestyle{#3} & \skillsetstyle{#4} \\
+}
+
+
 % Define an environment for cvitems(for cventry)
 \newenvironment{cvitems}{%
   \vspace{-4.0mm}
@@ -673,7 +712,7 @@
 % Define a title of the cover letter
 % Usage: \makelettertitle
 \newcommand*{\makelettertitle}{%
-  \vspace{8.4mm}
+  \vspace{3.5mm}
   \setlength\tabcolsep{0pt}
   \setlength{\extrarowheight}{0pt}
   \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} L{\textwidth - 4.5cm} R{4.5cm}}
@@ -682,9 +721,12 @@
   \begin{singlespace}
     \recipientaddressstyle{\@recipientaddress} \\\\
   \end{singlespace}
+  %\begin{singlespace}
+  %  \recipientdateofbirthstyle{\@recipientdateofbirth} \\\\
+  %\end{singlespace}
   \ifthenelse{\isundefined{\@lettertitle}}
     {}
-    {\lettertitlestyle{\@lettertitle} \\}
+    {\lettertitlestyle{\@lettertitle} \vspace{5mm} \\}
   \lettertextstyle{\@letteropening}
 }
 
@@ -693,11 +735,13 @@
 \newcommand*{\makeletterclosing}{%
   \vspace{3.4mm}
   \lettertextstyle{\@letterclosing} \\\\
-  \letternamestyle{\@firstname\ \@lastname}
+  \letternamestyle{\@firstname\ \@lastname } 
+  \newline
+  {\includegraphics[width=3cm]{./signature.png}}%
   \ifthenelse{\isundefined{\@letterenclosure}}
     {\\}
     {%
       \\\\\\
-      \letterenclosurestyle{\@letterenclname: \@letterenclosure} \\
+      \letterenclosurestyle{\@letterenclname: \@letterenclosure} 
     }
 }
